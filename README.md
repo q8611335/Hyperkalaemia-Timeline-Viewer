@@ -1,6 +1,6 @@
 # Hyperkalaemia Timeline Viewer
 
-## Live demo links: https://q8611335.github.io/hyperkalaemia-timeline-viewer/
+## Live demo links: https://q8611335.github.io/Hyperkalaemia-Timeline-Viewer/
 It extends my COMP90089 Assignment 1, a hyperkalaemia digital phenotype on MIMIC-IV, into a Flask + Plotly.js app running on the public MIMIC-IV Demo.
 
 ## Data
