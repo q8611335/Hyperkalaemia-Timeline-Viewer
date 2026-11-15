@@ -1,5 +1,6 @@
 
 let admissionAll = [];
+let heatRows = [];
 async function main() {
     admissionAll = await (await fetch("/api/admissions")).json(); // ask Flask for the admission list
     
@@ -16,8 +17,9 @@ async function main() {
     select.addEventListener("change", () => drawAdmission(Number(select.value)));
 
     select.value = 20297618; // set as default
+    await drawHeatmap();
     drawAdmission(20297618);
-    drawHeatmap();
+    
 }
 
 async function drawAdmission(hadmId) {
@@ -30,7 +32,8 @@ async function drawAdmission(hadmId) {
 
     const x = data.map(d => d.charttime); // extract charttime
     const y = data.map(d => d.valuenum); // extract valuenum
-    const colors = y.map(v => v > 5.0 ? "red" : "steelblue"); // color based on potassium level
+    const normal = data.filter(d => d.valuenum <= 5.0);
+    const high = data.filter(d => d.valuenum > 5.0);
     // console.log(x, y);
     const shapes = [
             {
@@ -72,8 +75,10 @@ async function drawAdmission(hadmId) {
 
     
     Plotly.newPlot("chart", [ // trace
-        { x: x, y: y, mode: "lines+markers", name: "Potassium", marker: { color: colors, size: 9 } },
-        { x: txData.map(d => d.charttime), y: txData.map(d => d.drug_class), yaxis: "y2", mode: "markers", name: "IV Treatment", marker: { symbol: "triangle-up", size: 12, color: "purple" } }
+        { x: x, y: y, mode: "lines", name: "Potassium", line: { color: "steelblue", width: 2 }, hoverinfo: "skip" },
+        { x: normal.map(d => d.charttime), y: normal.map(d => d.valuenum), mode: "markers", name: "K⁺ ≤ 5.0", marker: { color: "steelblue", size: 9 } },
+        { x: high.map(d => d.charttime), y: high.map(d => d.valuenum), mode: "markers", name: "K⁺ > 5.0", marker: { color: "red", size: 9 } },
+        { x: txData.map(d => d.charttime), y: txData.map(d => d.drug_class), yaxis: "y2", mode: "markers", name: "IV Treatment", marker: { symbol: "triangle-up", size: 12, color: "purple" } },
     ], { // layout
         title: { text: `Admission ${hadmId}${adm.high_k_on_admission ? " · K⁺ already high on admission" : ""}`, 
         font: { size: 14 } },
@@ -81,14 +86,19 @@ async function drawAdmission(hadmId) {
         margin: { l: 110, r: 20, t: 40, b: 40 },
         yaxis: { title: "K⁺ (mmol/L)", domain: [0.35, 1] },
         yaxis2: { type: "category", domain: [0, 0.25] },
-        xaxis: { anchor: "y2" },
+        xaxis: { anchor: "y2", tickangle: 0, nticks: 8 },
+        showlegend: true,
         legend: { orientation: "h", y: -0.12 },
         shapes: shapes,
     }, { displayModeBar: false, responsive: true }); // config
+    
+    highlightRow(hadmId);
+
 }
 
 async function drawHeatmap() {
     const heat = await (await fetch("/api/heatmap")).json();
+    heatRows = heat.y;
     Plotly.newPlot("heatmap", [ // trace
         {
             type: "heatmap",
@@ -120,6 +130,18 @@ async function drawHeatmap() {
         document.getElementById("admission-select").value = id;
         drawAdmission(id);
     });
+}
+// draw an orange box around the heatmap row that the timeline is showing
+function highlightRow(hadmId) {
+    const idx = heatRows.indexOf(String(hadmId));
+    const shapes = idx < 0 ? [] : [{
+        type: "rect",
+        xref: "paper", x0: 0, x1: 1,
+        yref: "y", y0: idx - 0.5, y1: idx + 0.5,
+        line: { color: "#e8590c", width: 2 },
+        fillcolor: "rgba(232, 89, 12, 0.08)",
+    }];
+    Plotly.relayout("heatmap", {shapes: shapes})
 }
 
 main();
