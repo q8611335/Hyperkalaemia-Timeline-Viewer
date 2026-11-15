@@ -5,7 +5,7 @@ A small web app that shows blood potassium results and emergency treatments for 
 - **Treatment heatmap**: admissions whose potassium went above 5.0 mmol/L (rows) against IV calcium, insulin and dextrose 50% (columns), coloured by the number of doses given. Click a row to open that admission's timeline.
 - **Admission timeline**: potassium results over the stay, with the normal range (3.5–5.0), the 5.0 threshold, each treatment class in its own lane underneath, and, for admissions that meet the phenotype, the onset and the 2-hour treatment window.
 
-It extends my COMP90089 (University of Melbourne) Assignment 1, a hyperkalaemia digital phenotype on MIMIC-IV, into a Flask + Plotly.js app running on the public MIMIC-IV Demo.
+It extends my COMP90089 Assignment 1, a hyperkalaemia digital phenotype on MIMIC-IV, into a Flask + Plotly.js app running on the public MIMIC-IV Demo.
 
 ## Data
 
@@ -80,10 +80,4 @@ step3_treatment.ipynb   IV treatments
 step4_phenotype.ipynb   phenotype + heatmap matrix
 ```
 
-## Findings and limitations
 
-- **Possible false positive.** Admission 29276678 meets the phenotype through a dose of *Calcium Gluconate sliding scale (Critical Care-Ionized calcium)*, which is calcium replacement rather than hyperkalaemia treatment. The same order was given before any high potassium. Excluding sliding-scale calcium would make the phenotype stricter.
-- **Unlinked lab results.** 602 potassium results have no `hadm_id`. Matching by admit–discharge time links 15; extending the window back to ED registration links 170 more; 417 stay unmatched. These are explored in `step1_matching` but not yet merged into `labs_all.json`.
-- Infusions charted as *Started* or *Confirmed* in eMAR are not counted, as in Assignment 1.
-- MIMIC dates are shifted for de-identification, so dates on the timeline are not real calendar dates.
-- The demo has only 100 patients, so only 2 admissions meet the phenotype.
