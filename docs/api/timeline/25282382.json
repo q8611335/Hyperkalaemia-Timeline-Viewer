@@ -1,0 +1,1 @@
+{"admission": {"drug_class": null, "hadm_id": 25282382, "high_k_on_admission": false, "max_k": 4.1, "med_time": null, "onset_k": null, "onset_time": null, "phenotype": false, "window_end": null}, "labs": [{"charttime": "2197-04-16T23:28:00.000", "hadm_id": 25282382.0, "valuenum": 4.1}], "treatments": []}

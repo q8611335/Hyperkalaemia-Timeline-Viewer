@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hyperkalaemia Timeline Viewer</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <header>
+        <h1>Hyperkalaemia Timeline Viewer</h1>
+        <p>Data: <a href="https://physionet.org/content/mimic-iv-demo/" target="_blank">MIMIC-IV Clinical Database Demo</a> 
+            (100 patients, Open Database License). For demonstration purposes only.</p>
+
+    </header>
+    <main>
+        <section class="card">
+            <h2>A · Treatment map</h2>
+            <p class="desc">Each row is an admission whose potassium went above 5.0 mmol/L, sorted by highest potassium.
+               Each cell counts the IV doses of calcium, insulin or dextrose 50%, furosemide or sodium bicarbonate given during the stay.
+               Click a row to open its timeline.</p>
+            <div class="heat-scroll">
+                <div id="heatmap"></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>B · Admission timeline</h2>
+            <p class="desc">Potassium results during the stay. The green band is the normal range (3.5–5.0 mmol/L)
+               and red points are above 5.0. Purple triangles show when each IV treatment was given.
+               For admissions marked ★, the blue line is the hyperkalaemia onset and the shaded area is the
+                2-hour window in which any of the IV treatments was given. 
+               ▲ marks admissions that first potassium was already above 5.0, so they are excluded from the in-hospital hyperkalaemia phenotype.</p>
+            <label>Admission: <select id="admission-select"></select></label>
+            <div id="chart"></div>
+        </section>
+    </main>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+    <script src="script.js"></script>
+   
+</body>
+</html>
