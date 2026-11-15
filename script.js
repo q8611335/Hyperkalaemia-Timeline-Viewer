@@ -8,7 +8,7 @@ async function main() {
     for (const a of admissionAll) {
         const option = document.createElement("option");
         option.value = a.hadm_id;
-        option.textContent = `${a.hadm_id} · max K ${a.max_k}${a.phenotype ? " ★" : ""}`;
+        option.textContent = `${a.hadm_id} · max K ${a.max_k}${a.phenotype ? " ★" : ""}${a.high_k_on_admission ? " ▲" : ""}`;
         select.append(option);
     }
 
@@ -71,22 +71,25 @@ async function drawAdmission(hadmId) {
         }
 
     
-    Plotly.newPlot("chart", [
+    Plotly.newPlot("chart", [ // trace
         { x: x, y: y, mode: "lines+markers", name: "Potassium", marker: { color: colors, size: 9 } },
         { x: txData.map(d => d.charttime), y: txData.map(d => d.drug_class), yaxis: "y2", mode: "markers", name: "IV Treatment", marker: { symbol: "triangle-up", size: 12, color: "purple" } }
-    ], {
-        title: `Potassium · admission ${hadmId}`, margin: { l: 140 },     
-        yaxis:{ title: "K⁺ (mmol/L)", domain: [0.35, 1] },
+    ], { // layout
+        title: { text: `Admission ${hadmId}${adm.high_k_on_admission ? " · K⁺ already high on admission" : ""}`, 
+        font: { size: 14 } },
+        height: 520,
+        margin: { l: 110, r: 20, t: 40, b: 40 },
+        yaxis: { title: "K⁺ (mmol/L)", domain: [0.35, 1] },
         yaxis2: { type: "category", domain: [0, 0.25] },
         xaxis: { anchor: "y2" },
+        legend: { orientation: "h", y: -0.12 },
         shapes: shapes,
-
-    });
+    }, { displayModeBar: false, responsive: true }); // config
 }
 
 async function drawHeatmap() {
     const heat = await (await fetch("/api/heatmap")).json();
-    Plotly.newPlot("heatmap", [
+    Plotly.newPlot("heatmap", [ // trace
         {
             type: "heatmap",
             x: heat.x,
@@ -103,15 +106,14 @@ async function drawHeatmap() {
             showscale: false,
             hovertemplate: "Admission %{y}<br>%{x}: %{z} dose(s)<extra></extra>"
         },
-    ], {
-        title: "IV treatments · admissions with K⁺ > 5.0",
-        width: 520,
-        height: heat.y.length * 18 + 150,
+    ], { // layout
+        height: heat.y.length * 18 + 60,
         yaxis: { type: "category", autorange: "reversed",
-                 dtick: 1, tickfont: { size: 10 } },
+                dtick: 1, tickfont: { size: 10 } },
         xaxis: { side: "top" },
-        margin: { l: 90, l: 100 },
-    });
+        margin: { l:80, r: 10, t: 40, b: 10 },
+
+    }, { displayModeBar: false, responsive: true }); // config
 
     document.getElementById("heatmap").on("plotly_click", (ev) => {
         const id = Number(ev.points[0].y);
