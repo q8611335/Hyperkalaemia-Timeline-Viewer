@@ -1,8 +1,13 @@
 
 let admissionAll = [];
 let heatRows = [];
+// on GitHub Pages there is no Flask, so read the pre-exported JSON files instead
+const STATIC = location.hostname.endsWith("github.io");
+function apiUrl(path) {
+    return STATIC ? `api/${path}.json` : `/api/${path}`;
+}
 async function main() {
-    admissionAll = await (await fetch("/api/admissions")).json(); // ask Flask for the admission list
+    admissionAll = await (await fetch(apiUrl("admissions"))).json(); // ask Flask for the admission list
     
     // find all unique admission and build dropdown menu
     const select = document.getElementById("admission-select");
@@ -25,7 +30,7 @@ async function main() {
 async function drawAdmission(hadmId) {
 
     // filter out admission from all patient
-    const t = await (await fetch(`/api/timeline/${hadmId}`)).json();
+    const t = await (await fetch(apiUrl(`/timeline/${hadmId}`))).json();
     const adm = t.admission;
     const data = t.labs;
     const txData = t.treatments;
@@ -97,7 +102,7 @@ async function drawAdmission(hadmId) {
 }
 
 async function drawHeatmap() {
-    const heat = await (await fetch("/api/heatmap")).json();
+    const heat = await (await fetch(apiUrl("heatmap"))).json();
     heatRows = heat.y;
     Plotly.newPlot("heatmap", [ // trace
         {
